@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Administración - Cementerio Municipal</title>
+</head>
+<body bgcolor="#BEBEBE">
+
+    <h1 align="center">Administración - Cementerio Municipal</h1>
+
+    <p align="center">
+        Bienvenido al panel de administración del Cementerio Municipal.<br>
+        Desde aquí puede acceder a los servicios, registros y gestiones administrativas.
+    </p>
+
+    <h2>Servicios disponibles</h2>
+    <ul>
+        <li>Inhumaciones</li>
+        <li>Exhumaciones</li>
+        <li>Reserva de parcela</li>
+        <li>Conservación y mantenimiento</li>
+        <li>Asesoría administrativa</li>
+    </ul>
+
+    <h2>Sectores y parcelas</h2>
+    <ol>
+        <li>Sector A</li>
+        <li>Sector B</li>
+        <li>Sector C (Jardín)</li>
+    </ol>
+
+    <h3>Ejemplo de registros</h3>
+
+    <p><b>Nombre:</b> Benavidez, Camila<br>
+    <b>Cédula:</b> 1724235187<br>
+    <b>Fecha:</b> 15/09/2025<br>
+    <b>Sector:</b> A1<br>
+    <b>Observación:</b> Parcela reservada por familia</p>
+
+    <h2>Formulario de Registro de Inhumación</h2>
+
+    <form action="procesar" method="post">
+        <p>Complete los datos para registrar una nueva inhumación:</p>
+
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        <br><br>
+
+        <label for="cedula">Cédula:</label>
+        <input type="text" id="cedula" name="cedula" required>
+        <br><br>
+
+        <label for="fecha">Fecha de Inhumación:</label>
+        <input type="date" id="fecha" name="fecha">
+        <br><br>
+
+        <label for="sector">Sector:</label>
+        <select id="sector" name="sector">
+            <option value="">Seleccione...</option>
+            <option value="A1">Sector A</option>
+            <option value="B1">Sector B</option>
+            <option value="C1">Sector C (Jardín)</option>
+        </select>
+        <br><br>
+
+        <label for="observacion">Observación:</label><br>
+        <textarea id="observacion" name="observacion" rows="3" cols="40" placeholder="Escriba una observación..."></textarea>
+        <br><br>
+
+        <input type="checkbox" id="terminos" name="terminos">
+        <label for="terminos">Confirmo que los datos son correctos</label>
+        <br><br>
+
+        <input type="submit" value="Registrar Inhumación">
+    </form>
+
+    <h2>Tabla de Registros Recientes</h2>
+    <table border="1" width="90%" align="center">
+        <tr bgcolor="#D8D8D8">
+            <th>Nombre</th>
+            <th>Cédula</th>
+            <th>Fecha</th>
+            <th>Sector</th>
+            <th>Observación</th>
+        </tr>
+        <tr>
+            <td>Benavidez, Camila</td>
+            <td>1724235187</td>
+            <td>15/09/2025</td>
+            <td>A1</td>
+            <td>Parcela reservada por familia</td>
+        </tr>
+
+    </table>
+
+    <h2 align="center">Galería del Cementerio</h2>
+    <p align="center">Imágenes representativas de los sectores y jardines:</p>
+
+    <center>
+        <img src="imagenes/cementerio1.jpg" alt="Vista sector A" width="300" height="200">
+        <img src="imagenes/cementerio2.jpg" alt="Vista sector B" width="300" height="200">
+        <img src="imagenes/cementerio3.jpg" alt="Jardín principal" width="300" height="200">
+        <br><br>
+
+        <a href="https://www.quito.gob.ec" target="_blank">
+            <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Escudo_de_Quito.svg" 
+                alt="Ir al Municipio de Quito" 
+                width="120">
+        </a>
+    </center>
+
+    <h2>Acciones administrativas</h2>
+    <ul>
+        <li>Registrar nueva inhumación</li>
+        <li>Reservar parcela</li>
+        <li>Actualizar datos del registro</li>
+        <li>Generar reporte mensual</li>
+    </ul>
+
+    <h3 align="center">Contacto</h3>
+    <p align="center">
+        Dirección: Av. Real Audiencia 123, Quito<br>
+        Teléfono: (04) 123-4567<br>
+        Correo: administracion.cementerio@gmail.com
+    </p>
+
+</body>
+</html>
+
