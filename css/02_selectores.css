@@ -1,0 +1,19 @@
+div p{
+    color: red;
+    background-color: aquamarine;
+    text-align: center;
+}
+ul> li{
+    color: green;
+    background-color: lightgoldenrodyellow;
+    text-align: center;
+
+}
+a:hover {
+    color: blueviolet;
+    text-decoration: underline;
+}
+input[type="text"]{ 
+    border: 2px solid blue;
+    padding: 5px;
+}
