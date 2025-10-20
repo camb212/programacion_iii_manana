@@ -1,0 +1,20 @@
+.contenedor {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #d7ccc8;
+  padding: 20px;
+}
+
+.area {
+  background-color: #a1887f;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 150px;
+  text-align: center;
+}
+
+.especial {
+  background-color: #4caf50;
+}

@@ -1,0 +1,12 @@
+.fondo {
+  color: white;
+  background-image: url("img/fondo_cementerio.jpg");
+  background-size: cover;
+  background-position: center;
+  background-color: #607d8b;
+  padding: 25px;
+  opacity: 0.9;
+  text-align: center;
+  font-size: 24px;
+  border-radius: 10px;
+}
