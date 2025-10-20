@@ -1,0 +1,27 @@
+.texto_primario {
+  color: darkslategray;
+  background-color: ghostwhite;
+  font-size: 24px;
+  font-family: 'Verdana', Geneva, sans-serif;
+  font-weight: bold;
+  line-height: 1.7;
+  text-decoration: underline;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  word-spacing: 5px;
+  white-space: nowrap;
+}
+
+.texto_secundario {
+  color: darkred;
+  background-color: beige;
+  font-size: 16px;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+  font-weight: normal;
+  line-height: 1.5;
+  text-decoration: line-through;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  word-spacing: 2px;
+  white-space: nowrap;
+}

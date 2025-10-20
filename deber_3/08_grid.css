@@ -1,0 +1,15 @@
+.grid {
+  display: grid;
+  grid-template-columns: 100px 100px 100px 100px;
+  gap: 10px;
+  background-color: #4e342e;
+  padding: 20px;
+}
+
+.nicho {
+  background-color: #cdb79e;
+  padding: 20px;
+  border: 2px solid #5d4037;
+  text-align: center;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}

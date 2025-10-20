@@ -1,0 +1,36 @@
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "aside main"
+    "footer footer";
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}
+
+header {
+  grid-area: header;
+  background-color: #b3e5fc;
+  padding: 10px;
+  text-align: center;
+}
+
+aside {
+  grid-area: aside;
+  background-color: #c8e6c9;
+  padding: 10px;
+}
+
+main {
+  grid-area: main;
+  background-color: #fff9c4;
+  padding: 10px;
+}
+
+footer {
+  grid-area: footer;
+  background-color: #ffcdd2;
+  text-align: center;
+  padding: 10px;
+}

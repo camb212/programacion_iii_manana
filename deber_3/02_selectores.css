@@ -1,0 +1,23 @@
+div p {
+  color: white;
+  background-color: darkgreen;
+  text-align: center;
+}
+
+ul > li {
+  color: black;
+  background-color: #d8cfc4;
+  text-align: center;
+  list-style: none;
+}
+
+a:hover {
+  color: darkred;
+  text-decoration: underline;
+}
+
+input[type="text"] {
+  border: 2px solid darkblue;
+  padding: 5px;
+  margin-top: 10px;
+}
