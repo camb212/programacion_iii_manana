@@ -2,21 +2,25 @@ import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  paginate,
-  IPaginationOptions,
-  Pagination,
-} from 'nestjs-typeorm-paginate';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { IPaginationOptions } from 'nestjs-typeorm-paginate';
+
+interface UserPaginationOptions extends IPaginationOptions {
+  search?: string;
+  searchField?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | null> {
     try {
@@ -26,24 +30,7 @@ export class UsersService {
         password: hashedPassword,
       });
       return await this.userRepository.save(user);
-    } catch (err) {
-      console.error('Error creating user:', err);
-      return null;
-    }
-  }
-
-  async findAll(
-    options: IPaginationOptions,
-    isActive?: boolean,
-  ): Promise<Pagination<User> | null> {
-    try {
-      const query = this.userRepository.createQueryBuilder('user');
-      if (isActive !== undefined) {
-        query.where('user.isActive = :isActive', { isActive });
-      }
-      return await paginate<User>(query, options);
-    } catch (err) {
-      console.error('Error retrieving users:', err);
+    } catch {
       return null;
     }
   }
@@ -51,8 +38,7 @@ export class UsersService {
   async findOne(id: string): Promise<User | null> {
     try {
       return await this.userRepository.findOne({ where: { id } });
-    } catch (err) {
-      console.error('Error finding user:', err);
+    } catch {
       return null;
     }
   }
@@ -60,10 +46,40 @@ export class UsersService {
   async findByUsername(username: string): Promise<User | null> {
     try {
       return await this.userRepository.findOne({ where: { username } });
-    } catch (err) {
-      console.error('Error finding user by username:', err);
+    } catch {
       return null;
     }
+  }
+
+  async findAll(
+    options: UserPaginationOptions,
+    isActive?: boolean,
+  ): Promise<Pagination<User>> {
+    const { search, searchField, sortBy, sortOrder, page, limit } = options;
+
+    const qb = this.userRepository.createQueryBuilder('user');
+
+    const allowedSearchFields = ['username', 'email'];
+    const allowedSortFields = ['id', 'username', 'createdAt'];
+
+    if (typeof isActive === 'boolean') {
+      qb.andWhere('user.isActive = :isActive', { isActive });
+    }
+
+    if (search && searchField && allowedSearchFields.includes(searchField)) {
+      qb.andWhere(`LOWER(user.${searchField}) LIKE :search`, {
+        search: `%${search.toLowerCase()}%`,
+      });
+    }
+
+    const orderField =
+      sortBy && allowedSortFields.includes(sortBy) ? sortBy : 'id';
+    const orderDirection: 'ASC' | 'DESC' =
+      sortOrder === 'DESC' ? 'DESC' : 'ASC';
+
+    qb.orderBy(`user.${orderField}`, orderDirection);
+
+    return paginate<User>(qb, { page, limit });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
@@ -77,8 +93,7 @@ export class UsersService {
 
       Object.assign(user, updateUserDto);
       return this.userRepository.save(user);
-    } catch (err) {
-      console.error('Error updating user:', err);
+    } catch {
       return null;
     }
   }
@@ -87,10 +102,8 @@ export class UsersService {
     try {
       const user = await this.findOne(id);
       if (!user) return null;
-
       return await this.userRepository.remove(user);
-    } catch (err) {
-      console.error('Error deleting user:', err);
+    } catch {
       return null;
     }
   }
@@ -102,8 +115,7 @@ export class UsersService {
 
       user.profile = filename;
       return await this.userRepository.save(user);
-    } catch (err) {
-      console.error('Error updating user profile image:', err);
+    } catch {
       return null;
     }
   }

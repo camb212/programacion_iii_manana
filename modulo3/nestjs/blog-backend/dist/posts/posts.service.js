@@ -27,7 +27,9 @@ let PostsService = class PostsService {
         this.categoryRepository = categoryRepository;
     }
     async create(createPostDto) {
-        const category = await this.categoryRepository.findOne({ where: { id: createPostDto.categoryId } });
+        const category = await this.categoryRepository.findOne({
+            where: { id: createPostDto.categoryId }
+        });
         if (!category)
             throw new common_1.NotFoundException('Categoría no encontrada');
         const post = this.postRepository.create({
@@ -38,19 +40,43 @@ let PostsService = class PostsService {
         return this.postRepository.save(post);
     }
     async findAll(options) {
-        const queryBuilder = this.postRepository.createQueryBuilder('post');
-        queryBuilder.leftJoinAndSelect('post.category', 'category');
-        return (0, nestjs_typeorm_paginate_1.paginate)(queryBuilder, options);
+        const { search, searchField, sortBy, sortOrder } = options;
+        const queryBuilder = this.postRepository
+            .createQueryBuilder('post')
+            .leftJoinAndSelect('post.category', 'category');
+        const allowedSearchFields = ['title', 'content'];
+        const allowedSortFields = ['id', 'title', 'createdAt'];
+        if (search && searchField && allowedSearchFields.includes(searchField)) {
+            queryBuilder.andWhere(`LOWER(post.${searchField}) LIKE :search`, { search: `%${search.toLowerCase()}%` });
+        }
+        const orderField = sortBy && allowedSortFields.includes(sortBy) ? sortBy : 'id';
+        const orderDirection = sortOrder === 'DESC' ? 'DESC' : 'ASC';
+        queryBuilder.orderBy(`post.${orderField}`, orderDirection);
+        return (0, nestjs_typeorm_paginate_1.paginate)(queryBuilder, {
+            page: options.page,
+            limit: options.limit,
+        });
     }
-    findOne(id) {
-        return this.postRepository.findOne({ where: { id }, relations: ['category'] });
+    async findOne(id) {
+        const post = await this.postRepository.findOne({
+            where: { id },
+            relations: ['category'],
+        });
+        if (!post)
+            throw new common_1.NotFoundException('Post no encontrado');
+        return post;
     }
     async update(id, updatePostDto) {
-        const post = await this.postRepository.findOne({ where: { id }, relations: ['category'] });
+        const post = await this.postRepository.findOne({
+            where: { id },
+            relations: ['category'],
+        });
         if (!post)
             throw new common_1.NotFoundException('Post no encontrado');
         if (updatePostDto.categoryId) {
-            const category = await this.categoryRepository.findOne({ where: { id: updatePostDto.categoryId } });
+            const category = await this.categoryRepository.findOne({
+                where: { id: updatePostDto.categoryId },
+            });
             if (!category)
                 throw new common_1.NotFoundException('Categoría no encontrada');
             post.category = category;

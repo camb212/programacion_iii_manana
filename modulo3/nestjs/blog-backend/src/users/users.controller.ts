@@ -1,21 +1,18 @@
 import {
   Controller, Get, Post, Put, Delete, Body, Param,
   Query, BadRequestException, NotFoundException,
-  UseInterceptors, UploadedFile,
-  InternalServerErrorException
+  UseInterceptors, UploadedFile
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { User } from './user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   async create(@Body() dto: CreateUserDto) {
@@ -27,15 +24,25 @@ export class UsersController {
   async findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-    @Query('isActive') isActive?: string,
-  ): Promise<SuccessResponseDto<Pagination<User>>> {
-    if (isActive !== undefined && isActive !== 'true' && isActive !== 'false') {
-      throw new BadRequestException('Invalid value for "isActive". Use "true" or "false".');
-    }
-    const result = await this.usersService.findAll({ page, limit }, isActive === 'true');
-    if (!result) throw new InternalServerErrorException('Could not retrieve users');
+    @Query('search') search?: string,
+    @Query('searchField') searchField = 'username',
+    @Query('sortBy') sortBy = 'id',
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
+  ) {
+    page = Number(page);
+    limit = Number(limit);
+    limit = limit > 100 ? 100 : limit;
 
-    return new SuccessResponseDto('Users retrieved successfully', result);
+    const users = await this.usersService.findAll({
+      page,
+      limit,
+      search,
+      searchField,
+      sortBy,
+      sortOrder,
+    });
+
+    return new SuccessResponseDto('Users retrieved successfully', users);
   }
 
   @Get(':id')
@@ -72,7 +79,10 @@ export class UsersController {
       cb(null, true);
     }
   }))
-  async uploadProfile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  async uploadProfile(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     if (!file) throw new BadRequestException('Profile image is required');
     const user = await this.usersService.updateProfile(id, file.filename);
     if (!user) throw new NotFoundException('User not found');

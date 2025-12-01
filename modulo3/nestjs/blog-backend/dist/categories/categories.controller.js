@@ -17,44 +17,68 @@ const common_1 = require("@nestjs/common");
 const categories_service_1 = require("./categories.service");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_category_dto_1 = require("./dto/update-category.dto");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const response_dto_1 = require("../common/dto/response.dto");
 let CategoriesController = class CategoriesController {
     categoriesService;
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
-        return this.categoriesService.create(createCategoryDto);
+    async create(dto) {
+        const category = await this.categoriesService.create(dto);
+        if (!category)
+            throw new common_1.InternalServerErrorException('Failed to create category');
+        return new response_dto_1.SuccessResponseDto('Category created successfully', category);
     }
-    findAll(page = 1, limit = 10) {
+    findAll(page = 1, limit = 10, search, searchField = 'name', sortBy = 'id', sortOrder = 'ASC') {
+        limit = Number(limit);
+        page = Number(page);
         limit = limit > 100 ? 100 : limit;
-        return this.categoriesService.findAllPaginated({ page, limit });
+        return this.categoriesService.findAll({
+            page,
+            limit,
+            search,
+            searchField,
+            sortBy,
+            sortOrder,
+        });
     }
-    findOne(id) {
-        return this.categoriesService.findOne(id);
+    async findOne(id) {
+        const category = await this.categoriesService.findOne(id);
+        if (!category)
+            throw new common_1.NotFoundException('Category not found');
+        return new response_dto_1.SuccessResponseDto('Category retrieved successfully', category);
     }
-    update(id, updateCategoryDto) {
-        return this.categoriesService.update(id, updateCategoryDto);
+    async update(id, dto) {
+        const category = await this.categoriesService.update(id, dto);
+        if (!category)
+            throw new common_1.NotFoundException('Category not found');
+        return new response_dto_1.SuccessResponseDto('Category updated successfully', category);
     }
-    remove(id) {
-        return this.categoriesService.remove(id);
+    async remove(id) {
+        const category = await this.categoriesService.remove(id);
+        if (!category)
+            throw new common_1.NotFoundException('Category not found');
+        return new response_dto_1.SuccessResponseDto('Category deleted successfully', category);
     }
 };
 exports.CategoriesController = CategoriesController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('page')),
     __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('search')),
+    __param(3, (0, common_1.Query)('searchField')),
+    __param(4, (0, common_1.Query)('sortBy')),
+    __param(5, (0, common_1.Query)('sortOrder')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object, Object, String, Object, Object, String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findAll", null);
 __decorate([
@@ -62,24 +86,22 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_category_dto_1.UpdateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "remove", null);
 exports.CategoriesController = CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),

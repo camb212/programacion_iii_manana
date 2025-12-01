@@ -16,39 +16,63 @@ exports.CategoriesService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const category_entity_1 = require("./category.entity");
 const nestjs_typeorm_paginate_1 = require("nestjs-typeorm-paginate");
+const category_entity_1 = require("./category.entity");
 let CategoriesService = class CategoriesService {
-    categoryRepository;
-    constructor(categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    categoryRepo;
+    constructor(categoryRepo) {
+        this.categoryRepo = categoryRepo;
     }
-    create(createCategoryDto) {
-        const category = this.categoryRepository.create(createCategoryDto);
-        return this.categoryRepository.save(category);
-    }
-    async findAllPaginated(options) {
-        const queryBuilder = this.categoryRepository.createQueryBuilder('category');
-        return (0, nestjs_typeorm_paginate_1.paginate)(queryBuilder, options);
-    }
-    findAll() {
-        return this.categoryRepository.find();
-    }
-    findOne(id) {
-        return this.categoryRepository.findOne({ where: { id } });
-    }
-    async update(id, updateCategoryDto) {
-        const category = await this.categoryRepository.findOne({ where: { id } });
-        if (!category)
+    async create(dto) {
+        try {
+            const category = this.categoryRepo.create(dto);
+            return await this.categoryRepo.save(category);
+        }
+        catch (err) {
             return null;
-        Object.assign(category, updateCategoryDto);
-        return this.categoryRepository.save(category);
+        }
+    }
+    async findAll(options) {
+        const { page, limit, search, searchField = 'name', sortBy = 'id', sortOrder = 'ASC', } = options;
+        const query = this.categoryRepo.createQueryBuilder('category');
+        if (search && search.trim() !== '') {
+            query.andWhere(`LOWER(category.${searchField}) LIKE :search`, {
+                search: `%${search.toLowerCase()}%`,
+            });
+        }
+        query.orderBy(`category.${sortBy}`, sortOrder);
+        return (0, nestjs_typeorm_paginate_1.paginate)(query, { page, limit });
+    }
+    async findOne(id) {
+        try {
+            return await this.categoryRepo.findOne({ where: { id } });
+        }
+        catch (err) {
+            return null;
+        }
+    }
+    async update(id, dto) {
+        try {
+            const category = await this.findOne(id);
+            if (!category)
+                return null;
+            Object.assign(category, dto);
+            return await this.categoryRepo.save(category);
+        }
+        catch (err) {
+            return null;
+        }
     }
     async remove(id) {
-        const category = await this.categoryRepository.findOne({ where: { id } });
-        if (!category)
+        try {
+            const category = await this.findOne(id);
+            if (!category)
+                return null;
+            return await this.categoryRepo.remove(category);
+        }
+        catch (err) {
             return null;
-        return this.categoryRepository.remove(category);
+        }
     }
 };
 exports.CategoriesService = CategoriesService;

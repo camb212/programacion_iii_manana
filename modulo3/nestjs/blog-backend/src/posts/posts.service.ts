@@ -7,6 +7,13 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Category } from '../categories/category.entity';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 
+interface PostPaginationOptions extends IPaginationOptions {
+  search?: string;
+  searchField?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
+
 @Injectable()
 export class PostsService {
   constructor(
@@ -15,10 +22,13 @@ export class PostsService {
 
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-  ) { }
+  ) {}
 
   async create(createPostDto: CreatePostDto) {
-    const category = await this.categoryRepository.findOne({ where: { id: createPostDto.categoryId } });
+    const category = await this.categoryRepository.findOne({
+      where: { id: createPostDto.categoryId }
+    });
+
     if (!category) throw new NotFoundException('Categoría no encontrada');
 
     const post = this.postRepository.create({
@@ -26,26 +36,69 @@ export class PostsService {
       content: createPostDto.content,
       category,
     });
+
     return this.postRepository.save(post);
   }
 
-  async findAll(options: IPaginationOptions): Promise<Pagination<Post>> {
-    const queryBuilder = this.postRepository.createQueryBuilder('post');
-    queryBuilder.leftJoinAndSelect('post.category', 'category');
-    return paginate<Post>(queryBuilder, options);
+  async findAll(options: PostPaginationOptions): Promise<Pagination<Post>> {
+    const { search, searchField, sortBy, sortOrder } = options;
+
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.category', 'category');
+
+    const allowedSearchFields = ['title', 'content'];
+    const allowedSortFields = ['id', 'title', 'createdAt'];
+
+    // Búsqueda
+    if (search && searchField && allowedSearchFields.includes(searchField)) {
+      queryBuilder.andWhere(
+        `LOWER(post.${searchField}) LIKE :search`,
+        { search: `%${search.toLowerCase()}%` },
+      );
+    }
+
+    // Ordenamiento
+    const orderField =
+      sortBy && allowedSortFields.includes(sortBy) ? sortBy : 'id';
+
+    const orderDirection: 'ASC' | 'DESC' =
+      sortOrder === 'DESC' ? 'DESC' : 'ASC';
+
+    queryBuilder.orderBy(`post.${orderField}`, orderDirection);
+
+    return paginate<Post>(queryBuilder, {
+      page: options.page,
+      limit: options.limit,
+    });
   }
 
-  findOne(id: string) {
-    return this.postRepository.findOne({ where: { id }, relations: ['category'] });
+  async findOne(id: string) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
+
+    if (!post) throw new NotFoundException('Post no encontrado');
+
+    return post;
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
-    const post = await this.postRepository.findOne({ where: { id }, relations: ['category'] });
+    const post = await this.postRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
+
     if (!post) throw new NotFoundException('Post no encontrado');
 
     if (updatePostDto.categoryId) {
-      const category = await this.categoryRepository.findOne({ where: { id: updatePostDto.categoryId } });
+      const category = await this.categoryRepository.findOne({
+        where: { id: updatePostDto.categoryId },
+      });
+
       if (!category) throw new NotFoundException('Categoría no encontrada');
+
       post.category = category;
     }
 
@@ -55,7 +108,9 @@ export class PostsService {
 
   async remove(id: string) {
     const post = await this.postRepository.findOne({ where: { id } });
+
     if (!post) throw new NotFoundException('Post no encontrado');
+
     return this.postRepository.remove(post);
   }
 }

@@ -1,14 +1,15 @@
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Post as PostEntity } from './post.entity';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { Post } from './post.entity';
+import { SuccessResponseDto } from 'src/common/dto/response.dto';
 export declare class PostsController {
     private readonly postsService;
     constructor(postsService: PostsService);
-    create(createPostDto: CreatePostDto): Promise<Post>;
-    findAll(page?: number, limit?: number): Promise<Pagination<Post>>;
-    findOne(id: string): Promise<Post | null>;
-    update(id: string, updatePostDto: UpdatePostDto): Promise<Post>;
-    remove(id: string): Promise<Post>;
+    create(createPostDto: CreatePostDto): Promise<SuccessResponseDto<PostEntity>>;
+    findAll(page?: number, limit?: number): Promise<SuccessResponseDto<Pagination<PostEntity>>>;
+    findOne(id: string): Promise<SuccessResponseDto<PostEntity>>;
+    update(id: string, updatePostDto: UpdatePostDto): Promise<SuccessResponseDto<PostEntity>>;
+    remove(id: string): Promise<SuccessResponseDto<string>>;
 }
