@@ -20,6 +20,7 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const response_dto_1 = require("../common/dto/response.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
+const query_dto_1 = require("../common/dto/query.dto");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -29,19 +30,17 @@ let UsersController = class UsersController {
         const user = await this.usersService.create(dto);
         return new response_dto_1.SuccessResponseDto('User created successfully', user);
     }
-    async findAll(page = 1, limit = 10, search, searchField = 'username', sortBy = 'id', sortOrder = 'ASC') {
-        page = Number(page);
-        limit = Number(limit);
-        limit = limit > 100 ? 100 : limit;
-        const users = await this.usersService.findAll({
-            page,
-            limit,
-            search,
-            searchField,
-            sortBy,
-            sortOrder,
-        });
-        return new response_dto_1.SuccessResponseDto('Users retrieved successfully', users);
+    async findAll(query, isActive) {
+        if (query.limit && query.limit > 100) {
+            query.limit = 100;
+        }
+        if (isActive !== undefined && isActive !== 'true' && isActive !== 'false') {
+            throw new common_1.BadRequestException('Invalid value for "isActive". Use "true" or "false".');
+        }
+        const result = await this.usersService.findAll(query, isActive === 'true');
+        if (!result)
+            throw new common_1.InternalServerErrorException('Could not retrieve users');
+        return new response_dto_1.SuccessResponseDto('Users retrieved successfully', result);
     }
     async findOne(id) {
         const user = await this.usersService.findOne(id);
@@ -80,14 +79,10 @@ __decorate([
 ], UsersController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('page')),
-    __param(1, (0, common_1.Query)('limit')),
-    __param(2, (0, common_1.Query)('search')),
-    __param(3, (0, common_1.Query)('searchField')),
-    __param(4, (0, common_1.Query)('sortBy')),
-    __param(5, (0, common_1.Query)('sortOrder')),
+    __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Query)('isActive')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, String, Object, Object, String]),
+    __metadata("design:paramtypes", [query_dto_1.QueryDto, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([

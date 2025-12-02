@@ -6,16 +6,16 @@ import {
   Delete,
   Body,
   Query,
-  Put,
   NotFoundException,
   InternalServerErrorException,
+  Put
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './post.entity';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -30,12 +30,16 @@ export class PostsController {
 
   @Get()
   async findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Query() query: QueryDto,
   ): Promise<SuccessResponseDto<Pagination<PostEntity>>> {
-    limit = limit > 100 ? 100 : limit;
-    const result = await this.postsService.findAll({ page, limit });
+    if (query.limit && query.limit > 100) {
+      query.limit = 100;
+    }
+
+    const result = await this.postsService.findAll(query);
+
     if (!result) throw new InternalServerErrorException('Could not retrieve posts');
+
     return new SuccessResponseDto('Posts retrieved successfully', result);
   }
 
@@ -49,7 +53,7 @@ export class PostsController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto
+    @Body() updatePostDto: CreatePostDto
   ): Promise<SuccessResponseDto<PostEntity>> {
     const updated = await this.postsService.update(id, updatePostDto);
     if (!updated) throw new NotFoundException('Post not found or category not valid');

@@ -16,8 +16,8 @@ exports.PostsController = void 0;
 const common_1 = require("@nestjs/common");
 const posts_service_1 = require("./posts.service");
 const create_post_dto_1 = require("./dto/create-post.dto");
-const update_post_dto_1 = require("./dto/update-post.dto");
 const response_dto_1 = require("../common/dto/response.dto");
+const query_dto_1 = require("../common/dto/query.dto");
 let PostsController = class PostsController {
     postsService;
     constructor(postsService) {
@@ -29,9 +29,11 @@ let PostsController = class PostsController {
             throw new common_1.NotFoundException('Category not found or error creating post');
         return new response_dto_1.SuccessResponseDto('Post created successfully', post);
     }
-    async findAll(page = 1, limit = 10) {
-        limit = limit > 100 ? 100 : limit;
-        const result = await this.postsService.findAll({ page, limit });
+    async findAll(query) {
+        if (query.limit && query.limit > 100) {
+            query.limit = 100;
+        }
+        const result = await this.postsService.findAll(query);
         if (!result)
             throw new common_1.InternalServerErrorException('Could not retrieve posts');
         return new response_dto_1.SuccessResponseDto('Posts retrieved successfully', result);
@@ -65,10 +67,9 @@ __decorate([
 ], PostsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('page')),
-    __param(1, (0, common_1.Query)('limit')),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [query_dto_1.QueryDto]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "findAll", null);
 __decorate([
@@ -83,7 +84,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_post_dto_1.UpdatePostDto]),
+    __metadata("design:paramtypes", [String, create_post_dto_1.CreatePostDto]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "update", null);
 __decorate([

@@ -18,6 +18,7 @@ const categories_service_1 = require("./categories.service");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_category_dto_1 = require("./dto/update-category.dto");
 const response_dto_1 = require("../common/dto/response.dto");
+const query_dto_1 = require("../common/dto/query.dto");
 let CategoriesController = class CategoriesController {
     categoriesService;
     constructor(categoriesService) {
@@ -29,18 +30,14 @@ let CategoriesController = class CategoriesController {
             throw new common_1.InternalServerErrorException('Failed to create category');
         return new response_dto_1.SuccessResponseDto('Category created successfully', category);
     }
-    findAll(page = 1, limit = 10, search, searchField = 'name', sortBy = 'id', sortOrder = 'ASC') {
-        limit = Number(limit);
-        page = Number(page);
-        limit = limit > 100 ? 100 : limit;
-        return this.categoriesService.findAll({
-            page,
-            limit,
-            search,
-            searchField,
-            sortBy,
-            sortOrder,
-        });
+    async findAll(query) {
+        if (query.limit && query.limit > 100) {
+            query.limit = 100;
+        }
+        const result = await this.categoriesService.findAll(query);
+        if (!result)
+            throw new common_1.InternalServerErrorException('Could not retrieve categories');
+        return new response_dto_1.SuccessResponseDto('Categories retrieved successfully', result);
     }
     async findOne(id) {
         const category = await this.categoriesService.findOne(id);
@@ -71,14 +68,9 @@ __decorate([
 ], CategoriesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('page')),
-    __param(1, (0, common_1.Query)('limit')),
-    __param(2, (0, common_1.Query)('search')),
-    __param(3, (0, common_1.Query)('searchField')),
-    __param(4, (0, common_1.Query)('sortBy')),
-    __param(5, (0, common_1.Query)('sortOrder')),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, String, Object, Object, String]),
+    __metadata("design:paramtypes", [query_dto_1.QueryDto]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findAll", null);
 __decorate([
