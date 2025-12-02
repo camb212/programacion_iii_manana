@@ -10,7 +10,10 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
-  app.useStaticAssets(join(__dirname, '..', 'public')); 
+  app.useStaticAssets(join(__dirname, '..', 'public')),
+  {
+    prefix: '/public'
+  }
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
