@@ -7,10 +7,11 @@ const common_1 = require("@nestjs/common");
 const win32_1 = require("path/win32");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    await app.listen(process.env.PORT ?? 3000);
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
     app.useGlobalFilters(new http_exception_filter_1.GlobalHttpExceptionFilter());
-    app.useStaticAssets((0, win32_1.join)(__dirname, '..', 'public'));
+    app.useStaticAssets((0, win32_1.join)(__dirname, '..', 'public'), {
+        prefix: '/public',
+    });
     await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
