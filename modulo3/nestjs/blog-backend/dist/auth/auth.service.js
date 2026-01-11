@@ -55,17 +55,27 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async login(loginDto) {
-        const user = await this.usersService.findByUsername(loginDto.username);
-        if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        try {
+            const user = await this.usersService.findByUsername(loginDto.username);
+            if (!user)
+                return null;
+            const isValid = await bcrypt.compare(loginDto.password, user.password);
+            if (!isValid)
+                return null;
+            const payload = { id: user.id, username: user.username };
+            return this.jwtService.sign(payload);
         }
-        const payload = { id: user.id, username: user.username };
-        return { access_token: this.jwtService.sign(payload) };
+        catch (err) {
+            console.error('Unexpected login error:', err);
+            return null;
+        }
     }
     async register(createUserDto) {
         const user = await this.usersService.create(createUserDto);
-        const payload = { id: user.id, username: user.username };
-        return { access_token: this.jwtService.sign(payload) };
+        if (!user)
+            return null;
+        const payload = { id: user.id, email: user.username };
+        return this.jwtService.sign(payload);
     }
 };
 exports.AuthService = AuthService;

@@ -3,12 +3,14 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Category } from './category.entity';
+import { SuccessResponseDto } from 'src/common/dto/response.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
 export declare class CategoriesController {
     private readonly categoriesService;
     constructor(categoriesService: CategoriesService);
-    create(createCategoryDto: CreateCategoryDto): Promise<Category>;
-    findAll(page?: number, limit?: number): Promise<Pagination<Category>>;
-    findOne(id: string): Promise<Category | null>;
-    update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category | null>;
-    remove(id: string): Promise<Category | null>;
+    create(dto: CreateCategoryDto): Promise<SuccessResponseDto<Category>>;
+    findAll(query: QueryDto): Promise<SuccessResponseDto<Pagination<Category>>>;
+    findOne(id: string): Promise<SuccessResponseDto<Category>>;
+    update(id: string, dto: UpdateCategoryDto): Promise<SuccessResponseDto<Category>>;
+    remove(id: string): Promise<SuccessResponseDto<Category>>;
 }
