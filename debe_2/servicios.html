@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Servicios - Cementerio Municipal</title>
+</head>
+<body bgcolor="#BEBEBE">
+
+    <h1 align="center">Servicios del Cementerio Municipal</h1>
+
+    <ul>
+        <li>Inhumaciones</li>
+        <li>Exhumaciones</li>
+        <li>Reserva de parcela</li>
+        <li>Conservación y mantenimiento</li>
+        <li>Asesoría administrativa</li>
+    </ul>
+
+    <h2>Formulario de Registro de Inhumación</h2>
+
+    <form action="procesar" method="post">
+        <p>Complete los datos para registrar una nueva inhumación:</p>
+
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="cedula">Cédula:</label>
+        <input type="text" id="cedula" name="cedula" required><br><br>
+
+        <label for="fecha">Fecha de Inhumación:</label>
+        <input type="date" id="fecha" name="fecha"><br><br>
+
+        <label for="sector">Sector:</label>
+        <select id="sector" name="sector">
+            <option value="">Seleccione...</option>
+            <option value="A1">Sector A</option>
+            <option value="B1">Sector B</option>
+            <option value="C1">Sector C (Jardín)</option>
+        </select><br><br>
+
+        <label for="observacion">Observación:</label><br>
+        <textarea id="observacion" name="observacion" rows="3" cols="40" placeholder="Escriba una observación..."></textarea><br><br>
+
+        <input type="checkbox" id="terminos" name="terminos">
+        <label for="terminos">Confirmo que los datos son correctos</label><br><br>
+
+        <input type="submit" value="Registrar Inhumación">
+    </form>
+
+    <hr>
+    <p align="center">
+        <a href="index.html">Inicio</a> |
+        <a href="acerca.html">Acerca</a> |
+        <a href="tabla.html">Registros</a> |
+        <a href="contacto.html">Contacto</a>
+    </p>
+
+</body>
+</html>
